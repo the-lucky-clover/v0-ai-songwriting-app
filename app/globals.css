@@ -1,0 +1,272 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Cyberwave Sakura theme for Lyrical.top */
+:root {
+  /* Neon Accent Colors */
+  --neon-cyan: #00f0ff;
+  --neon-magenta: #ff00ff;
+  --neon-purple: #9d4edd;
+  --neon-pink: #ff6b9d;
+  --neon-yellow: #fcee0a;
+
+  /* Dark Glass Backgrounds */
+  --glass-ultra-dark: rgba(5, 5, 15, 0.95);
+  --glass-dark: rgba(10, 10, 30, 0.85);
+  --glass-medium: rgba(20, 20, 50, 0.75);
+  --glass-light: rgba(40, 40, 80, 0.65);
+
+  /* Theme variables that will be dynamically updated */
+  --theme-bg-primary: #0a0a1e;
+  --theme-bg-secondary: #050510;
+  --theme-bg-tertiary: #0a0520;
+  --theme-accent-primary: #00f0ff;
+  --theme-accent-secondary: #9d4edd;
+  --theme-accent-glow: rgba(0, 240, 255, 0.4);
+  --theme-text-primary: #ffffff;
+  --theme-text-secondary: #e0e0e0;
+  --theme-text-muted: #808080;
+  --theme-border: rgba(255, 255, 255, 0.08);
+  --theme-glass: rgba(10, 10, 30, 0.85);
+
+  /* Core tokens - Dark theme */
+  --background: oklch(0.08 0.02 280);
+  --foreground: oklch(0.98 0 0);
+  --card: oklch(0.12 0.02 280);
+  --card-foreground: oklch(0.98 0 0);
+  --popover: oklch(0.1 0.02 280);
+  --popover-foreground: oklch(0.98 0 0);
+  --primary: oklch(0.75 0.2 195);
+  --primary-foreground: oklch(0.1 0.02 280);
+  --secondary: oklch(0.2 0.02 280);
+  --secondary-foreground: oklch(0.98 0 0);
+  --muted: oklch(0.2 0.02 280);
+  --muted-foreground: oklch(0.65 0 0);
+  --accent: oklch(0.7 0.25 320);
+  --accent-foreground: oklch(0.98 0 0);
+  --destructive: oklch(0.55 0.25 25);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: rgba(255, 255, 255, 0.08);
+  --input: rgba(255, 255, 255, 0.08);
+  --ring: oklch(0.75 0.2 195);
+  --radius: 1rem;
+
+  /* Sidebar */
+  --sidebar: oklch(0.1 0.02 280);
+  --sidebar-foreground: oklch(0.98 0 0);
+  --sidebar-primary: oklch(0.75 0.2 195);
+  --sidebar-primary-foreground: oklch(0.1 0.02 280);
+  --sidebar-accent: oklch(0.15 0.02 280);
+  --sidebar-accent-foreground: oklch(0.98 0 0);
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-ring: oklch(0.75 0.2 195);
+
+  /* Charts */
+  --chart-1: oklch(0.75 0.2 195);
+  --chart-2: oklch(0.7 0.25 320);
+  --chart-3: oklch(0.65 0.25 290);
+  --chart-4: oklch(0.7 0.2 350);
+  --chart-5: oklch(0.85 0.2 95);
+}
+
+@theme inline {
+  --font-sans: "Inter", "Geist", sans-serif;
+  --font-mono: "JetBrains Mono", "Geist Mono", monospace;
+  --font-display: "Orbitron", sans-serif;
+
+  /* Color tokens */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Neon colors */
+  --color-neon-cyan: var(--neon-cyan);
+  --color-neon-magenta: var(--neon-magenta);
+  --color-neon-purple: var(--neon-purple);
+  --color-neon-pink: var(--neon-pink);
+  --color-neon-yellow: var(--neon-yellow);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    /* Add transition for smooth theme changes */
+    transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1), color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Add transition to root for CSS variables */
+  :root {
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+}
+
+@layer utilities {
+  /* Glassmorphic panel style */
+  .glass-panel {
+    /* Use theme variable for glass background */
+    background: var(--theme-glass);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--theme-border);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05), inset 0 -1px 0
+      rgba(0, 0, 0, 0.2);
+    /* Add transition for smooth theme changes */
+    transition: background 0.6s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.6s cubic-bezier(0.4, 0, 0.2, 1), box-shadow
+      0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Neon glow effects */
+  .neon-glow-cyan {
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.4), 0 0 40px rgba(0, 240, 255, 0.2), 0 0 60px rgba(0, 240, 255, 0.1);
+  }
+
+  .neon-glow-magenta {
+    box-shadow: 0 0 20px rgba(255, 0, 255, 0.4), 0 0 40px rgba(255, 0, 255, 0.2), 0 0 60px rgba(255, 0, 255, 0.1);
+  }
+
+  .neon-glow-purple {
+    box-shadow: 0 0 20px rgba(157, 78, 221, 0.4), 0 0 40px rgba(157, 78, 221, 0.2), 0 0 60px rgba(157, 78, 221, 0.1);
+  }
+
+  /* Add dynamic theme glow that uses theme colors */
+  .neon-glow-theme {
+    box-shadow: 0 0 20px var(--theme-accent-glow), 0 0 40px var(--theme-accent-glow), 0 0 60px var(--theme-accent-glow);
+    transition: box-shadow 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Gradient border */
+  .gradient-border {
+    position: relative;
+  }
+
+  .gradient-border::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    padding: 2px;
+    /* Use theme colors for gradient */
+    background: linear-gradient(
+      135deg,
+      var(--theme-accent-primary),
+      var(--theme-accent-secondary),
+      var(--theme-accent-primary)
+    );
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
+    transition: background 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Shimmer animation */
+  .shimmer {
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.05) 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  /* Pulse glow animation */
+  .animate-pulse-glow {
+    animation: pulse-glow 2s infinite;
+  }
+
+  @keyframes pulse-glow {
+    0%,
+    100% {
+      box-shadow: 0 0 20px var(--theme-accent-glow), 0 0 40px var(--theme-accent-glow);
+    }
+    50% {
+      box-shadow: 0 0 30px var(--theme-accent-glow), 0 0 60px var(--theme-accent-glow), 0 0 80px
+        var(--theme-accent-glow);
+    }
+  }
+
+  /* Scrollbar utility */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+  }
+
+  /* Text glow */
+  .text-glow-cyan {
+    text-shadow: 0 0 10px rgba(0, 240, 255, 0.5), 0 0 20px rgba(0, 240, 255, 0.3);
+  }
+
+  .text-glow-magenta {
+    text-shadow: 0 0 10px rgba(255, 0, 255, 0.5), 0 0 20px rgba(255, 0, 255, 0.3);
+  }
+
+  /* Add dynamic theme text glow */
+  .text-glow-theme {
+    text-shadow: 0 0 10px var(--theme-accent-glow), 0 0 20px var(--theme-accent-glow);
+    transition: text-shadow 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
