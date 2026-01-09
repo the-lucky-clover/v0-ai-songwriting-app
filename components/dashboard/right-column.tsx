@@ -8,53 +8,8 @@ import { useStore } from "@/lib/store"
 import { findRhymes, findSynonyms, type RhymeResult } from "@/lib/rhymes"
 import { useDebounce } from "@/hooks/use-debounce"
 import { cn } from "@/lib/utils"
+import { BentoPanel } from "./left-column"
 import type React from "react"
-
-function BentoPanel({
-  children,
-  className,
-  delay = 0,
-  glowColor = "cyan",
-}: {
-  children: React.ReactNode
-  className?: string
-  delay?: number
-  glowColor?: "cyan" | "magenta" | "purple" | "yellow"
-}) {
-  const glowColors = {
-    cyan: "rgba(0, 240, 255, 0.15)",
-    magenta: "rgba(255, 0, 255, 0.15)",
-    purple: "rgba(157, 78, 221, 0.15)",
-    yellow: "rgba(252, 238, 10, 0.15)",
-  }
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ delay, type: "spring", stiffness: 100, damping: 20 }}
-      className={cn("relative overflow-hidden rounded-2xl border border-white/10", className)}
-      style={{
-        background: "linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
-        boxShadow: `
-          0 8px 32px rgba(0,0,0,0.3),
-          inset 0 1px 0 rgba(255,255,255,0.08),
-          0 0 40px ${glowColors[glowColor]}
-        `,
-        backdropFilter: "blur(40px) saturate(180%)",
-      }}
-      whileHover={{
-        boxShadow: `
-          0 12px 40px rgba(0,0,0,0.4),
-          inset 0 1px 0 rgba(255,255,255,0.1),
-          0 0 60px ${glowColors[glowColor]}
-        `,
-      }}
-    >
-      {children}
-    </motion.div>
-  )
-}
 
 export function RightColumn() {
   return (

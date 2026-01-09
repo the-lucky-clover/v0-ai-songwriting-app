@@ -54,35 +54,49 @@ export function AIModal() {
     setIsGenerating(true)
     setAIConfig(localConfig)
 
-    // Simulate generation progress
-    const stages = [
-      { progress: 30, message: "Analyzing musical influence..." },
-      { progress: 50, message: "Researching style patterns..." },
-      { progress: 80, message: "Crafting verses and hooks..." },
-      { progress: 95, message: "Adding finishing touches..." },
-      { progress: 100, message: "Complete!" },
-    ]
-
-    for (const stage of stages) {
-      await new Promise((r) => setTimeout(r, 800))
-      setGenerationProgress(stage.progress)
-    }
-
-    // Generate mock lyrics
-    const lyrics = generateMockLyrics(localConfig)
-
-    // Create or update file
-    if (currentFileId) {
-      updateFile(currentFileId, {
-        content: lyrics,
-        title: localConfig.songTitle || "Generated Song",
-        musical_influence: localConfig.musicalInfluence,
-        subject_matter: localConfig.subjectMatter,
+    try {
+      const response = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          subjectMatter: localConfig.subjectMatter,
+          musicalInfluence: localConfig.musicalInfluence,
+          influenceType: localConfig.influenceType,
+          verseCount: localConfig.verseCount,
+          barsPerVerse: localConfig.barsPerVerse,
+          chorusCount: localConfig.chorusCount,
+          audioTag: localConfig.audioTag,
+          songTitle: localConfig.songTitle,
+        }),
       })
-    } else {
-      createFile(localConfig.songTitle || "Generated Song", lyrics)
-    }
 
+      if (!response.body) throw new Error("No response body")
+
+      const reader = response.body.getReader()
+      let lyrics = ""
+      let done = false
+      while (!done) {
+        const { value, done: readerDone } = await reader.read()
+        if (value) {
+          lyrics += new TextDecoder().decode(value)
+          setGenerationProgress(Math.min(100, lyrics.length / 10)) // crude progress
+        }
+        done = readerDone
+      }
+
+      if (currentFileId) {
+        updateFile(currentFileId, {
+          content: lyrics,
+          title: localConfig.songTitle || "Generated Song",
+          musical_influence: localConfig.musicalInfluence,
+          subject_matter: localConfig.subjectMatter,
+        })
+      } else {
+        createFile(localConfig.songTitle || "Generated Song", lyrics)
+      }
+    } catch (err) {
+      // Optionally handle error
+    }
     setIsGenerating(false)
     setGenerationProgress(0)
     setIsAIModalOpen(false)

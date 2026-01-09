@@ -1,0 +1,11 @@
+bin/
+obj/
+*.user
+*.suo
+*.vspackages
+.vs/
+.vscode/
+
+# Keep internal build outputs ignored
+internal/bin/
+internal/obj/

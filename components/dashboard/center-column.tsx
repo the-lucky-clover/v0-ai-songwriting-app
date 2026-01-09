@@ -11,6 +11,7 @@ import { useStore } from "@/lib/store"
 import { countLineSyllables, getStats, getCurrentWord } from "@/lib/syllables"
 import { cn } from "@/lib/utils"
 import { useDebounce } from "@/hooks/use-debounce"
+import { BentoPanel } from "./left-column"
 
 export function CenterColumn() {
   const { files, currentFileId, updateFile, createFile, setCurrentWord, saveVersion } = useStore()
@@ -105,147 +106,125 @@ export function CenterColumn() {
 
   return (
     <div className="flex flex-1 flex-col gap-4">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.98 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ type: "spring", stiffness: 100, damping: 20 }}
-        className="relative flex flex-1 flex-col overflow-hidden rounded-2xl border border-white/10"
-        style={{
-          background: "linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
-          boxShadow: `
-            0 8px 32px rgba(0,0,0,0.4),
-            inset 0 1px 0 rgba(255,255,255,0.1),
-            0 0 60px rgba(0,240,255,0.1)
-          `,
-          backdropFilter: "blur(40px) saturate(180%)",
-        }}
-      >
-        {/* Toolbar */}
-        <div className="flex items-center justify-between border-b border-white/5 px-4 py-2">
-          <div className="flex items-center gap-3">
-            <motion.div whileHover={{ rotate: 360 }} transition={{ duration: 0.5 }}>
-              <Music2 className="h-5 w-5 text-[#00f0ff]" style={{ filter: "drop-shadow(0 0 8px #00f0ff)" }} />
-            </motion.div>
-            {isEditingTitle ? (
-              <Input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                onBlur={handleTitleSubmit}
-                onKeyDown={(e) => e.key === "Enter" && handleTitleSubmit()}
-                className="h-7 w-48 border-[#00f0ff]/50 bg-transparent text-sm text-white"
-                autoFocus
-              />
-            ) : (
-              <motion.button
-                onClick={() => setIsEditingTitle(true)}
-                className="flex items-center gap-2 text-sm font-medium text-white transition-colors hover:text-[#00f0ff]"
-                whileHover={{ scale: 1.02 }}
-              >
-                {title || "Untitled Draft"}
-                <Pencil className="h-3 w-3 opacity-50" />
-              </motion.button>
-            )}
-          </div>
-
-          <div className="flex items-center gap-1">
-            <ToolbarButton icon={Undo} onClick={handleUndo} disabled={historyIndex <= 0} tooltip="Undo" />
-            <ToolbarButton
-              icon={Redo}
-              onClick={handleRedo}
-              disabled={historyIndex >= history.length - 1}
-              tooltip="Redo"
-            />
-            <div className="mx-2 h-4 w-px bg-white/10" />
-            <ToolbarButton icon={copied ? Check : Copy} onClick={handleCopy} tooltip="Copy" active={copied} />
-            <ToolbarButton icon={Trash2} onClick={handleClear} tooltip="Clear" variant="destructive" />
-            <div className="mx-2 h-4 w-px bg-white/10" />
-            <motion.div
-              className="flex items-center gap-1 rounded-lg border border-green-500/30 bg-green-500/10 px-2 py-1 text-xs text-green-400"
-              animate={{ opacity: [1, 0.7, 1] }}
-              transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
-            >
-              <Check className="h-3 w-3" />
-              <span>v{Math.max(1, history.length - 1)}</span>
-            </motion.div>
-          </div>
-        </div>
-
-        {/* Editor Area */}
-        <div className="relative flex flex-1 overflow-hidden">
-          {/* Line Numbers */}
-          <div className="w-14 shrink-0 overflow-hidden border-r border-white/5 bg-black/20 py-4 text-right">
-            {lines.map((_, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: i * 0.01 }}
-                className="h-8 pr-3 font-mono text-sm leading-8 text-white/30"
-              >
-                {i + 1}
+      <BentoPanel delay={0.1} glowColor="cyan" className="flex flex-1 flex-col">
+        {/* Toolbar and Editor Area */}
+        <div className="flex flex-col flex-1">
+          {/* Toolbar */}
+          <div className="flex items-center justify-between border-b border-white/5 px-4 py-2">
+            <div className="flex items-center gap-3">
+              <motion.div whileHover={{ rotate: 360 }} transition={{ duration: 0.5 }}>
+                <Music2 className="h-5 w-5 text-[#00f0ff]" style={{ filter: "drop-shadow(0 0 8px #00f0ff)" }} />
               </motion.div>
-            ))}
+              {isEditingTitle ? (
+                <Input
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  onBlur={handleTitleSubmit}
+                  onKeyDown={(e) => e.key === "Enter" && handleTitleSubmit()}
+                  className="h-7 w-48 border-[#00f0ff]/50 bg-transparent text-sm text-white"
+                  autoFocus
+                />
+              ) : (
+                <motion.button
+                  onClick={() => setIsEditingTitle(true)}
+                  className="flex items-center gap-2 text-sm font-medium text-white transition-colors hover:text-[#00f0ff]"
+                  whileHover={{ scale: 1.02 }}
+                >
+                  {title || "Untitled Draft"}
+                  <Pencil className="h-3 w-3 opacity-50" />
+                </motion.button>
+              )}
+            </div>
+
+            <div className="flex items-center gap-1">
+              <ToolbarButton icon={Undo} onClick={handleUndo} disabled={historyIndex <= 0} tooltip="Undo" />
+              <ToolbarButton
+                icon={Redo}
+                onClick={handleRedo}
+                disabled={historyIndex >= history.length - 1}
+                tooltip="Redo"
+              />
+              <div className="mx-2 h-4 w-px bg-white/10" />
+              <ToolbarButton icon={copied ? Check : Copy} onClick={handleCopy} tooltip="Copy" active={copied} />
+              <ToolbarButton icon={Trash2} onClick={handleClear} tooltip="Clear" variant="destructive" />
+              <div className="mx-2 h-4 w-px bg-white/10" />
+              <motion.div
+                className="flex items-center gap-1 rounded-lg border border-green-500/30 bg-green-500/10 px-2 py-1 text-xs text-green-400"
+                animate={{ opacity: [1, 0.7, 1] }}
+                transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
+              >
+                <Check className="h-3 w-3" />
+                <span>v{Math.max(1, history.length - 1)}</span>
+              </motion.div>
+            </div>
           </div>
 
-          {/* Text Area */}
-          <div className="relative flex-1 overflow-auto scrollbar-thin">
-            <textarea
-              ref={textareaRef}
-              value={content}
-              onChange={(e) => handleContentChange(e.target.value)}
-              onSelect={handleCursorChange}
-              onClick={handleCursorChange}
-              onKeyUp={handleCursorChange}
-              placeholder="Start writing your lyrics..."
-              className="absolute inset-0 h-full w-full resize-none bg-transparent p-4 font-mono text-lg leading-8 text-white placeholder:text-white/30 focus:outline-none"
-              style={{
-                caretColor: "#00f0ff",
-                lineHeight: "2rem",
-              }}
-              spellCheck={false}
-            />
-          </div>
+          {/* Editor Area */}
+          <div className="relative flex flex-1 overflow-hidden">
+            {/* Line Numbers */}
+            <div className="w-14 shrink-0 overflow-hidden border-r border-white/5 bg-black/20 py-4 text-right">
+              {lines.map((_, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: i * 0.01 }}
+                  className="h-8 pr-3 font-mono text-sm leading-8 text-white/30"
+                >
+                  {i + 1}
+                </motion.div>
+              ))}
+            </div>
 
-          {/* Syllable Count */}
-          <div className="w-16 shrink-0 overflow-hidden border-l border-white/5 bg-black/20 py-4 text-center">
-            <AnimatePresence mode="popLayout">
-              {lines.map((line, i) => {
-                const syllables = countLineSyllables(line)
-                const isSection = /^\[.*\]$/.test(line.trim())
+            {/* Text Area */}
+            <div className="relative flex-1 overflow-auto scrollbar-thin">
+              <textarea
+                ref={textareaRef}
+                value={content}
+                onChange={(e) => handleContentChange(e.target.value)}
+                onSelect={handleCursorChange}
+                onClick={handleCursorChange}
+                onKeyUp={handleCursorChange}
+                placeholder="Start writing your lyrics..."
+                className="absolute inset-0 h-full w-full resize-none bg-transparent p-4 font-mono text-lg leading-8 text-white placeholder:text-white/30 focus:outline-none"
+                style={{
+                  caretColor: "#00f0ff",
+                  lineHeight: "2rem",
+                }}
+                spellCheck={false}
+              />
+            </div>
 
-                return (
-                  <motion.div
-                    key={`${i}-${syllables}`}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    className={cn(
-                      "h-8 font-mono text-sm leading-8",
-                      syllables > 0 ? "text-[#00f0ff]" : "text-white/20",
-                    )}
-                    style={syllables > 0 ? { textShadow: "0 0 10px rgba(0,240,255,0.5)" } : {}}
-                  >
-                    {isSection || syllables === 0 ? "-" : syllables}
-                  </motion.div>
-                )
-              })}
-            </AnimatePresence>
+            {/* Syllable Count */}
+            <div className="w-16 shrink-0 overflow-hidden border-l border-white/5 bg-black/20 py-4 text-center">
+              <AnimatePresence mode="popLayout">
+                {lines.map((line, i) => {
+                  const syllables = countLineSyllables(line)
+                  const isSection = /^\[.*\]$/.test(line.trim())
+
+                  return (
+                    <motion.div
+                      key={`${i}-${syllables}`}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      className={cn(
+                        "h-8 font-mono text-sm leading-8",
+                        syllables > 0 ? "text-[#00f0ff]" : "text-white/20",
+                      )}
+                      style={syllables > 0 ? { textShadow: "0 0 10px rgba(0,240,255,0.5)" } : {}}
+                    >
+                      {isSection || syllables === 0 ? "-" : syllables}
+                    </motion.div>
+                  )
+                })}
+              </AnimatePresence>
+            </div>
           </div>
         </div>
-      </motion.div>
-
-      {/* Stats Bar - Premium bento card */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="overflow-hidden rounded-2xl border border-white/10 px-6 py-4"
-        style={{
-          background: "linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
-          boxShadow: "0 4px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08)",
-          backdropFilter: "blur(40px)",
-        }}
-      >
+      </BentoPanel>
+      <BentoPanel delay={0.2} glowColor="magenta" className="overflow-hidden px-6 py-4">
+        {/* Stats Bar */}
         <div className="flex items-center justify-center gap-6 text-sm md:gap-10">
           <StatItem label="Syllables" value={stats.syllables} icon={Mic} color="#00f0ff" />
           <StatDivider />
@@ -257,7 +236,7 @@ export function CenterColumn() {
           <StatDivider />
           <StatItem label="Duration" value={stats.duration} icon={BarChart3} color="#fcee0a" />
         </div>
-      </motion.div>
+      </BentoPanel>
     </div>
   )
 }
