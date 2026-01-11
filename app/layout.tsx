@@ -12,11 +12,21 @@ const _inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 const _jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrains" })
 
 export const metadata: Metadata = {
-  title: "LYRICAL.TOP - AI-Powered Songwriting Studio",
+  title: "LYRICAL AI - AI-Powered Songwriting Studio",
   description:
-    "Where Words Become Anthems. AI-assisted songwriting with real-time syllable counting, rhyme detection, and style emulation.",
+    "Where Words Become Anthems. AI-assisted songwriting with real-time syllable counting, rhyme detection, and style emulation. lyrical.top",
   generator: "v0.app",
-  keywords: ["songwriting", "AI", "lyrics", "music", "rhyme", "syllable counter", "songwriter"],
+  keywords: [
+    "songwriting",
+    "AI",
+    "lyrics",
+    "music",
+    "rhyme",
+    "syllable counter",
+    "songwriter",
+    "lyrical ai",
+    "lyrical.top",
+  ],
   icons: {
     icon: [
       {
@@ -33,6 +43,20 @@ export const metadata: Metadata = {
       },
     ],
     apple: "/apple-icon.png",
+  },
+  openGraph: {
+    title: "LYRICAL AI - AI-Powered Songwriting Studio",
+    description:
+      "Where Words Become Anthems. AI-assisted songwriting with real-time syllable counting, rhyme detection, and style emulation.",
+    url: "https://lyrical.top",
+    siteName: "LYRICAL AI",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "LYRICAL AI - AI-Powered Songwriting Studio",
+    description:
+      "Where Words Become Anthems. AI-assisted songwriting with real-time syllable counting, rhyme detection, and style emulation.",
   },
 }
 

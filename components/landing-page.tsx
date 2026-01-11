@@ -1,9 +1,10 @@
 "use client"
 
 import { motion, AnimatePresence } from "framer-motion"
-import { Sparkles, Zap, Music, Brain, Mic2, ChevronRight, Stars } from "lucide-react"
+import { Sparkles, Zap, Music, Brain, Mic2, ChevronRight, Stars, Heart } from "lucide-react"
 import { LandingBackground } from "./landing-background"
 import { useState, useEffect } from "react"
+import Link from "next/link"
 
 interface LandingPageProps {
   onGetStarted: () => void
@@ -26,6 +27,8 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
     const timer = setTimeout(() => setLoaded(true), 100)
     return () => clearTimeout(timer)
   }, [])
+
+  const currentYear = new Date().getFullYear()
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-black">
@@ -58,7 +61,7 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
       </div>
 
       {/* Main content */}
-      <div className="relative flex min-h-screen flex-col items-center justify-center px-4 py-20">
+      <div className="relative flex min-h-screen flex-col items-center justify-center px-4 py-20 pb-32">
         <AnimatePresence>
           {loaded && (
             <>
@@ -99,7 +102,7 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
                     className="text-6xl font-black tracking-[0.15em] text-white md:text-8xl lg:text-9xl"
                     style={{ fontFamily: "Orbitron, system-ui, sans-serif" }}
                   >
-                    LYRICAL
+                    LYRICAL AI
                   </h1>
                 </motion.div>
                 <motion.div
@@ -111,14 +114,16 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
                     background: "linear-gradient(90deg, transparent, #00f0ff, #9d4edd, #ff00ff, transparent)",
                   }}
                 />
-                <motion.span
+                {/* Bottom text */}
+                <motion.p
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: 1 }}
-                  className="mt-1 block text-2xl font-light tracking-[0.5em] text-white/60 md:text-3xl"
+                  transition={{ duration: 0.5, delay: 2.5 }}
+                  className="mt-8 flex items-center gap-2 text-sm text-white/40"
                 >
-                  .TOP
-                </motion.span>
+                  <Sparkles className="h-4 w-4" />
+                  No account required • lyrical.top • Powered by AI
+                </motion.p>
               </motion.div>
 
               {/* Tagline */}
@@ -200,21 +205,46 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
                   <ChevronRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                 </motion.button>
               </motion.div>
-
-              {/* Bottom text */}
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5, delay: 2.5 }}
-                className="mt-8 flex items-center gap-2 text-sm text-white/40"
-              >
-                <Sparkles className="h-4 w-4" />
-                No account required • Powered by AI
-              </motion.p>
             </>
           )}
         </AnimatePresence>
       </div>
+
+      <motion.footer
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: loaded ? 1 : 0, y: loaded ? 0 : 20 }}
+        transition={{ duration: 0.8, delay: 2.5 }}
+        className="absolute bottom-0 left-0 right-0 border-t border-white/5 bg-black/50 backdrop-blur-sm"
+      >
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-4 md:flex-row">
+          {/* Left side - Copyright */}
+          <p className="text-sm text-white/40">COPYRIGHT {currentYear} - ALL RIGHTS RESERVED - LYRICAL AI</p>
+
+          {/* Right side - Links */}
+          <div className="flex items-center gap-6 text-sm text-white/40">
+            <Link href="/terms" className="transition-colors hover:text-white/70">
+              TERMS
+            </Link>
+            <Link href="/privacy" className="transition-colors hover:text-white/70">
+              PRIVACY
+            </Link>
+            <Link href="/contact" className="transition-colors hover:text-white/70">
+              CONTACT
+            </Link>
+            <span className="flex items-center gap-1">
+              MADE WITH <Heart className="h-3 w-3 text-[#ff00ff]" fill="#ff00ff" /> BY{" "}
+              <a
+                href="https://soundcloud.com/lucky-clover"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#00f0ff] transition-colors hover:text-[#ff00ff]"
+              >
+                LUCKY CLOVER
+              </a>
+            </span>
+          </div>
+        </div>
+      </motion.footer>
     </div>
   )
 }

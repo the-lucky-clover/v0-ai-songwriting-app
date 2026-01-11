@@ -1,14 +1,26 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Sparkles, X } from "lucide-react"
+import { Sparkles, X, Dna, Search, Brain, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
 import { useStore } from "@/lib/store"
 import { cn } from "@/lib/utils"
+
+interface AnalysisData {
+  artist: string
+  analysis: string
+  attributes: {
+    emotionalTone: string
+    lyricalThemes: string
+    writingStyle: string
+    rhymePattern: string
+    imagery: string
+  }
+}
 
 export function AIModal() {
   const {
@@ -23,10 +35,12 @@ export function AIModal() {
     createFile,
     updateFile,
     currentFileId,
-    files,
   } = useStore()
 
   const [localConfig, setLocalConfig] = useState(aiConfig)
+  const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null)
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const generateStructurePreview = () => {
     const parts: string[] = []
@@ -40,66 +54,118 @@ export function AIModal() {
     }
 
     if (chorusCount > 0) {
-      // Last chorus becomes bridge
       parts.push("Bridge")
-      parts.push("Hook") // Final hook after bridge
+      parts.push("Hook")
     }
 
     return parts
   }
 
+  // AudioGenetics: Analyze musical influence
+  const analyzeInfluence = useCallback(async () => {
+    if (!localConfig.musicalInfluence.trim()) return
+
+    setIsAnalyzing(true)
+    setError(null)
+
+    try {
+      const response = await fetch("/api/audiogenetics/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          artist: localConfig.musicalInfluence,
+        }),
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || "Analysis failed")
+      }
+
+      const data = await response.json()
+      setAnalysisData(data)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to analyze influence")
+    } finally {
+      setIsAnalyzing(false)
+    }
+  }, [localConfig.musicalInfluence])
+
+  // AudioGenetics: Generate lyrics with real AI
   const handleGenerate = async () => {
     if (!localConfig.subjectMatter.trim()) return
 
     setIsGenerating(true)
+    setError(null)
     setAIConfig(localConfig)
 
+    const stages = [
+      { progress: 15, message: "Initializing AudioGenetics engine..." },
+      { progress: 30, message: "Analyzing musical genome..." },
+      { progress: 50, message: "Processing lyrical patterns..." },
+      { progress: 70, message: "Composing original verses..." },
+      { progress: 85, message: "Crafting hooks and bridges..." },
+      { progress: 95, message: "Finalizing composition..." },
+    ]
+
+    // Animate progress
+    const progressInterval = setInterval(() => {
+      const currentStage = stages.find((s) => s.progress > generationProgress)
+      if (currentStage) {
+        setGenerationProgress(currentStage.progress)
+      }
+    }, 600)
+
     try {
-      const response = await fetch("/api/generate", {
+      const response = await fetch("/api/audiogenetics/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           subjectMatter: localConfig.subjectMatter,
           musicalInfluence: localConfig.musicalInfluence,
-          influenceType: localConfig.influenceType,
+          mood: localConfig.audioTag,
           verseCount: localConfig.verseCount,
           barsPerVerse: localConfig.barsPerVerse,
           chorusCount: localConfig.chorusCount,
           audioTag: localConfig.audioTag,
           songTitle: localConfig.songTitle,
+          analysisData: analysisData?.attributes,
         }),
       })
 
-      if (!response.body) throw new Error("No response body")
+      clearInterval(progressInterval)
 
-      const reader = response.body.getReader()
-      let lyrics = ""
-      let done = false
-      while (!done) {
-        const { value, done: readerDone } = await reader.read()
-        if (value) {
-          lyrics += new TextDecoder().decode(value)
-          setGenerationProgress(Math.min(100, lyrics.length / 10)) // crude progress
-        }
-        done = readerDone
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || "Generation failed")
       }
 
+      const data = await response.json()
+      setGenerationProgress(100)
+
+      // Create or update file with generated lyrics
       if (currentFileId) {
         updateFile(currentFileId, {
-          content: lyrics,
+          content: data.lyrics,
           title: localConfig.songTitle || "Generated Song",
           musical_influence: localConfig.musicalInfluence,
           subject_matter: localConfig.subjectMatter,
         })
       } else {
-        createFile(localConfig.songTitle || "Generated Song", lyrics)
+        createFile(localConfig.songTitle || "Generated Song", data.lyrics)
       }
+
+      setTimeout(() => {
+        setIsGenerating(false)
+        setGenerationProgress(0)
+        setIsAIModalOpen(false)
+      }, 500)
     } catch (err) {
-      // Optionally handle error
+      clearInterval(progressInterval)
+      setError(err instanceof Error ? err.message : "Failed to generate lyrics")
+      setIsGenerating(false)
+      setGenerationProgress(0)
     }
-    setIsGenerating(false)
-    setGenerationProgress(0)
-    setIsAIModalOpen(false)
   }
 
   const structureParts = generateStructurePreview()
@@ -134,8 +200,20 @@ export function AIModal() {
           {/* Header */}
           <div className="flex items-center justify-between border-b border-white/5 px-6 py-4">
             <div className="flex items-center gap-3">
-              <Sparkles className="h-6 w-6 text-neon-cyan" />
-              <h2 className="text-xl font-semibold text-white">AI Songwriter Studio</h2>
+              <div className="relative">
+                <Dna className="h-6 w-6 text-neon-cyan" />
+                <motion.div
+                  className="absolute inset-0"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 10, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+                >
+                  <Sparkles className="h-6 w-6 text-neon-magenta opacity-50" />
+                </motion.div>
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold text-white">AudioGenetics Studio</h2>
+                <p className="text-xs text-white/50">AI-Powered Lyric Composition Engine</p>
+              </div>
             </div>
             <Button
               variant="ghost"
@@ -149,9 +227,20 @@ export function AIModal() {
 
           {/* Content */}
           <div className="space-y-6 p-6">
+            {/* Error Display */}
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-400"
+              >
+                {error}
+              </motion.div>
+            )}
+
             {/* Subject Matter */}
             <div className="space-y-2">
-              <Label className="text-white">SUBJECT MATTER *</Label>
+              <Label className="text-white">SUBJECT MATTER / MOOD *</Label>
               <Input
                 placeholder='e.g., "heartbreak in a neon city" or "finding hope after loss"'
                 value={localConfig.subjectMatter}
@@ -160,19 +249,60 @@ export function AIModal() {
               />
             </div>
 
-            {/* Musical Influence */}
+            {/* Musical Influence with Analysis */}
             <div className="space-y-2">
               <Label className="text-white">MUSICAL INFLUENCE (optional)</Label>
-              <Input
-                placeholder='e.g., "The Weeknd", "90s hip-hop", "K-pop", "Blinding Lights"'
-                value={localConfig.musicalInfluence}
-                onChange={(e) => setLocalConfig({ ...localConfig, musicalInfluence: e.target.value })}
-                className="border-white/10 bg-white/5 text-white placeholder:text-white/30"
-              />
-              <p className="text-xs text-white/40">
-                Leave empty for general style, or enter any artist/band/song/album/genre
-              </p>
+              <div className="flex gap-2">
+                <Input
+                  placeholder='e.g., "The Weeknd", "90s hip-hop", "ethereal pop"'
+                  value={localConfig.musicalInfluence}
+                  onChange={(e) => {
+                    setLocalConfig({ ...localConfig, musicalInfluence: e.target.value })
+                    setAnalysisData(null)
+                  }}
+                  className="flex-1 border-white/10 bg-white/5 text-white placeholder:text-white/30"
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={analyzeInfluence}
+                  disabled={!localConfig.musicalInfluence.trim() || isAnalyzing}
+                  className="gap-2 border-neon-cyan/30 bg-neon-cyan/10 text-neon-cyan hover:bg-neon-cyan/20"
+                >
+                  {isAnalyzing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+                  Analyze
+                </Button>
+              </div>
+              <p className="text-xs text-white/40">Click "Analyze" to extract lyrical DNA from your influence</p>
             </div>
+
+            {/* Analysis Results */}
+            {analysisData && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                className="rounded-xl border border-neon-cyan/20 bg-neon-cyan/5 p-4"
+              >
+                <div className="mb-3 flex items-center gap-2">
+                  <Brain className="h-4 w-4 text-neon-cyan" />
+                  <span className="text-sm font-medium text-neon-cyan">Musical Genome Extracted</span>
+                </div>
+                <div className="grid gap-2 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-white/50">Emotional Tone:</span>
+                    <span className="text-white">{analysisData.attributes.emotionalTone}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-white/50">Themes:</span>
+                    <span className="text-white">{analysisData.attributes.lyricalThemes}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-white/50">Style:</span>
+                    <span className="text-white">{analysisData.attributes.writingStyle}</span>
+                  </div>
+                </div>
+              </motion.div>
+            )}
 
             {/* Song Title & Audio Tag */}
             <div className="grid gap-4 sm:grid-cols-2">
@@ -203,7 +333,6 @@ export function AIModal() {
               <h3 className="mb-4 font-semibold text-white">STRUCTURE CONTROLS</h3>
 
               <div className="grid gap-6 sm:grid-cols-2">
-                {/* Verses Slider */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <Label className="text-white/70">Verses</Label>
@@ -219,7 +348,6 @@ export function AIModal() {
                   />
                 </div>
 
-                {/* Bars per Verse Slider */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <Label className="text-white/70">Bars per Verse</Label>
@@ -236,7 +364,6 @@ export function AIModal() {
                 </div>
               </div>
 
-              {/* Choruses Slider */}
               <div className="mt-6 space-y-3">
                 <div className="flex items-center justify-between">
                   <Label className="text-white/70">Choruses/Hooks (last one = Bridge)</Label>
@@ -295,16 +422,19 @@ export function AIModal() {
                 "relative w-full overflow-hidden rounded-xl py-4 text-lg font-semibold text-white transition-all",
                 !localConfig.subjectMatter.trim() || isGenerating
                   ? "cursor-not-allowed bg-white/10 text-white/50"
-                  : "bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-magenta animate-pulse-glow",
+                  : "bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-magenta",
               )}
             >
               {isGenerating ? (
-                <span>Generating...</span>
+                <span className="flex items-center justify-center gap-2">
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  Generating...
+                </span>
               ) : (
                 <span className="flex items-center justify-center gap-2">
-                  <Sparkles className="h-5 w-5" />
-                  GENERATE LYRICS
-                  <Sparkles className="h-5 w-5" />
+                  <Dna className="h-5 w-5" />
+                  GENERATE WITH AUDIOGENETICS
+                  <Dna className="h-5 w-5" />
                 </span>
               )}
             </motion.button>
@@ -314,7 +444,7 @@ export function AIModal() {
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-2">
                 <div className="h-2 overflow-hidden rounded-full bg-white/10">
                   <motion.div
-                    className="h-full bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-magenta shimmer"
+                    className="h-full bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-magenta"
                     animate={{ width: `${generationProgress}%` }}
                     transition={{ duration: 0.5 }}
                   />
@@ -332,84 +462,11 @@ export function AIModal() {
 }
 
 function getProgressMessage(progress: number): string {
-  if (progress < 30) return "Analyzing musical influence..."
-  if (progress < 50) return "Researching style patterns..."
-  if (progress < 80) return "Crafting verses and hooks..."
-  if (progress < 100) return "Adding finishing touches..."
+  if (progress < 15) return "Initializing AudioGenetics engine..."
+  if (progress < 30) return "Analyzing musical genome..."
+  if (progress < 50) return "Processing lyrical patterns..."
+  if (progress < 70) return "Composing original verses..."
+  if (progress < 85) return "Crafting hooks and bridges..."
+  if (progress < 100) return "Finalizing composition..."
   return "Complete!"
-}
-
-function generateMockLyrics(config: typeof useStore.prototype.aiConfig): string {
-  const { subjectMatter, verseCount, barsPerVerse, chorusCount } = config
-
-  let lyrics = `[${config.songTitle || "Untitled Song"}]\n`
-  lyrics += `[Audio Tag: ${config.audioTag || "Contemporary Pop"}]\n\n`
-
-  const versePhrases = [
-    "In the shadows of the night, I feel your presence fade",
-    "Like whispered dreams that float away, memories cascade",
-    "Every heartbeat echoes with the words we never said",
-    "Dancing with your ghost inside the corners of my head",
-    "Neon lights flicker and glow, painting stories untold",
-    "In the silence of the dark, these feelings take hold",
-    "Running through the city streets where our love once burned",
-    "Searching for the pieces of the lessons never learned",
-    "Lucky Clover on my mind, blessings in disguise",
-    "Fortune favors those who dare to look beyond the lies",
-    "Stars align above the skyline, destiny unfolds",
-    "Every story worth telling is the one that we both hold",
-  ]
-
-  const hookLines = [
-    "But you're gone, gone, gone",
-    "Like a song, song, song",
-    "That I can't get out of my head tonight",
-    "No, you're gone, gone, gone",
-    "But I'll stay strong, strong, strong",
-    "Till the very end",
-  ]
-
-  const bridgeLines = [
-    "And in this moment, time stands still",
-    "The neon lights illuminate what's real",
-    "I reach for you through space and time",
-    "Knowing that these memories are mine",
-    "Lucky Clover showed the way",
-    "Through the night into the day",
-  ]
-
-  for (let v = 1; v <= verseCount; v++) {
-    lyrics += `[Verse ${v}]\n`
-    const startIdx = ((v - 1) * 4) % versePhrases.length
-    for (let b = 0; b < Math.min(barsPerVerse / 4, 4); b++) {
-      const phraseIdx = (startIdx + b) % versePhrases.length
-      lyrics += `${versePhrases[phraseIdx]}\n`
-    }
-    lyrics += `[Instrumental]\n\n`
-
-    if (v <= chorusCount - 1) {
-      lyrics += `[Hook]\n`
-      lyrics += `${hookLines[0]}\n`
-      lyrics += `${hookLines[1]}\n`
-      lyrics += `${hookLines[2]}\n`
-      lyrics += `[Harmonizing]\n\n`
-    }
-  }
-
-  if (chorusCount > 0) {
-    lyrics += `[Bridge]\n`
-    for (const line of bridgeLines) {
-      lyrics += `${line}\n`
-    }
-    lyrics += `[Drop]\n`
-    lyrics += `[Instrumental]\n\n`
-
-    lyrics += `[Hook]\n`
-    for (const line of hookLines) {
-      lyrics += `${line}\n`
-    }
-    lyrics += `[Harmonizing]\n`
-  }
-
-  return lyrics
 }

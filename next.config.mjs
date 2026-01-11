@@ -6,10 +6,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  output: 'export',
-  turbopack: {
-    root: 'd:\\dev\\v0-ai-songwriting-app',
-  },
+ 
 }
 
 export default nextConfig
