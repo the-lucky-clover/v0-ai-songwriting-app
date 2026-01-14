@@ -105,14 +105,14 @@ export function CenterColumn() {
   const stats = getStats(content)
 
   return (
-    <div className="flex flex-1 flex-col gap-4">
+    <div className="flex flex-1 flex-col gap-3 md:gap-4">
       <motion.div
-        initial={{ opacity: 0, y: 30, scale: 0.98 }}
+        initial={{ opacity: 0, y: 20, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={smoothSpring}
         className="group/editor relative flex flex-1 flex-col overflow-hidden rounded-2xl"
       >
-        {/* Multi-layer background */}
+        {/* Background */}
         <div
           className="absolute inset-0"
           style={{
@@ -124,9 +124,8 @@ export function CenterColumn() {
           }}
         />
 
-        {/* Border and glow */}
         <div
-          className="absolute inset-0 rounded-2xl transition-all duration-500"
+          className="absolute inset-0 rounded-2xl"
           style={{
             boxShadow: `
               inset 0 0 0 1px rgba(255,255,255,0.08),
@@ -136,13 +135,6 @@ export function CenterColumn() {
           }}
         />
 
-        {/* Hover glow */}
-        <motion.div
-          className="absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-500 group-hover/editor:opacity-100"
-          style={{ boxShadow: "0 0 80px rgba(0,240,255,0.12)" }}
-        />
-
-        {/* Top highlight */}
         <div
           className="absolute inset-x-0 top-0 h-px"
           style={{
@@ -151,30 +143,30 @@ export function CenterColumn() {
         />
 
         <div className="relative flex flex-1 flex-col">
-          <div className="flex items-center justify-between border-b border-white/5 px-4 py-3">
-            <div className="flex items-center gap-3">
-              <motion.div whileHover={{ rotate: 360, scale: 1.1 }} transition={{ duration: 0.6 }}>
-                <Music2 className="h-5 w-5 text-[#00f0ff]" style={{ filter: "drop-shadow(0 0 10px #00f0ff)" }} />
-              </motion.div>
+          {/* Header */}
+          <div className="flex items-center justify-between border-b border-white/5 px-3 py-2 md:px-4 md:py-3">
+            <div className="flex items-center gap-2 md:gap-3">
+              <Music2
+                className="h-4 w-4 text-[#00f0ff] md:h-5 md:w-5"
+                style={{ filter: "drop-shadow(0 0 10px #00f0ff)" }}
+              />
               {isEditingTitle ? (
                 <Input
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   onBlur={handleTitleSubmit}
                   onKeyDown={(e) => e.key === "Enter" && handleTitleSubmit()}
-                  className="h-8 w-52 border-[#00f0ff]/50 bg-black/30 text-sm text-white focus:border-[#00f0ff]"
+                  className="h-7 w-36 border-[#00f0ff]/50 bg-black/30 text-sm text-white focus:border-[#00f0ff] md:h-8 md:w-52"
                   autoFocus
                 />
               ) : (
-                <motion.button
+                <button
                   onClick={() => setIsEditingTitle(true)}
                   className="group/title flex items-center gap-2 rounded-lg px-2 py-1 text-sm font-medium text-white transition-all duration-300 hover:bg-white/5"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
                 >
-                  {title || "Untitled Draft"}
+                  <span className="max-w-[120px] truncate md:max-w-none">{title || "Untitled Draft"}</span>
                   <Pencil className="h-3 w-3 opacity-0 transition-opacity group-hover/title:opacity-50" />
-                </motion.button>
+                </button>
               )}
             </div>
 
@@ -186,13 +178,13 @@ export function CenterColumn() {
                 disabled={historyIndex >= history.length - 1}
                 tooltip="Redo"
               />
-              <div className="mx-2 h-5 w-px bg-white/10" />
+              <div className="mx-1 hidden h-5 w-px bg-white/10 md:mx-2 md:block" />
               <ToolbarButton icon={copied ? Check : Copy} onClick={handleCopy} tooltip="Copy" active={copied} />
               <ToolbarButton icon={Trash2} onClick={handleClear} tooltip="Clear" variant="destructive" />
-              <div className="mx-2 h-5 w-px bg-white/10" />
+              <div className="mx-1 hidden h-5 w-px bg-white/10 md:mx-2 md:block" />
 
               <motion.div
-                className="flex items-center gap-1.5 rounded-lg border border-green-500/30 bg-green-500/10 px-3 py-1.5 text-xs text-green-400"
+                className="hidden items-center gap-1.5 rounded-lg border border-green-500/30 bg-green-500/10 px-2 py-1 text-xs text-green-400 md:flex md:px-3 md:py-1.5"
                 animate={{
                   boxShadow: [
                     "0 0 10px rgba(34,197,94,0.2)",
@@ -215,17 +207,14 @@ export function CenterColumn() {
           {/* Editor Area */}
           <div className="relative flex flex-1 overflow-hidden">
             {/* Line Numbers */}
-            <div className="w-14 shrink-0 overflow-hidden border-r border-white/5 bg-black/20 py-4 text-right">
+            <div className="w-10 shrink-0 overflow-hidden border-r border-white/5 bg-black/20 py-3 text-right md:w-14 md:py-4">
               {lines.map((_, i) => (
-                <motion.div
+                <div
                   key={i}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: i * 0.01 }}
-                  className="h-8 pr-3 font-mono text-sm leading-8 text-white/25"
+                  className="h-7 pr-2 font-mono text-xs leading-7 text-white/25 md:h-8 md:pr-3 md:text-sm md:leading-8"
                 >
                   {i + 1}
-                </motion.div>
+                </div>
               ))}
             </div>
 
@@ -239,17 +228,16 @@ export function CenterColumn() {
                 onClick={handleCursorChange}
                 onKeyUp={handleCursorChange}
                 placeholder="Start writing your lyrics..."
-                className="absolute inset-0 h-full w-full resize-none bg-transparent p-4 font-mono text-lg leading-8 text-white placeholder:text-white/25 focus:outline-none"
+                className="absolute inset-0 h-full w-full resize-none bg-transparent p-3 font-mono text-base leading-7 text-white placeholder:text-white/25 focus:outline-none md:p-4 md:text-lg md:leading-8"
                 style={{
                   caretColor: "#00f0ff",
-                  lineHeight: "2rem",
                 }}
                 spellCheck={false}
               />
             </div>
 
             {/* Syllable Count Column */}
-            <div className="w-16 shrink-0 overflow-hidden border-l border-white/5 bg-black/20 py-4 text-center">
+            <div className="w-12 shrink-0 overflow-hidden border-l border-white/5 bg-black/20 py-3 text-center md:w-16 md:py-4">
               <AnimatePresence mode="popLayout">
                 {lines.map((line, i) => {
                   const syllables = countLineSyllables(line)
@@ -263,7 +251,7 @@ export function CenterColumn() {
                       exit={{ opacity: 0, scale: 0.8 }}
                       transition={{ duration: 0.2 }}
                       className={cn(
-                        "h-8 font-mono text-sm leading-8 transition-all duration-300",
+                        "h-7 font-mono text-xs leading-7 transition-all duration-300 md:h-8 md:text-sm md:leading-8",
                         syllables > 0 ? "text-[#00f0ff]" : "text-white/15",
                       )}
                       style={syllables > 0 ? { textShadow: "0 0 12px rgba(0,240,255,0.6)" } : {}}
@@ -278,44 +266,38 @@ export function CenterColumn() {
         </div>
       </motion.div>
 
+      {/* Stats Bar */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2, ...smoothSpring }}
-        className="group/stats relative overflow-hidden rounded-2xl"
+        className="relative overflow-hidden rounded-2xl"
       >
-        {/* Background */}
         <div
           className="absolute inset-0"
           style={{
-            background: `
-              linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)
-            `,
+            background: "linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
             backdropFilter: "blur(40px)",
           }}
         />
 
-        {/* Border */}
         <div
           className="absolute inset-0 rounded-2xl"
           style={{
-            boxShadow: `
-              inset 0 0 0 1px rgba(255,255,255,0.06),
-              0 4px 24px rgba(0,0,0,0.25)
-            `,
+            boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.06), 0 4px 24px rgba(0,0,0,0.25)",
           }}
         />
 
-        <div className="relative flex items-center justify-center gap-4 px-6 py-4 md:gap-8">
+        <div className="relative flex flex-wrap items-center justify-center gap-3 px-4 py-3 md:gap-6 md:px-6 md:py-4">
           <StatItem label="Syllables" value={stats.syllables} icon={Mic} color="#00f0ff" />
           <StatDivider />
           <StatItem label="Words" value={stats.words} icon={BarChart3} color="#ff00ff" />
           <StatDivider />
           <StatItem label="Lines" value={stats.lines} icon={BarChart3} color="#9d4edd" />
-          <StatDivider />
-          <StatItem label="Bars" value={stats.bars} icon={Music2} color="#ff6b9d" />
-          <StatDivider />
-          <StatItem label="Duration" value={stats.duration} icon={Timer} color="#fcee0a" />
+          <StatDivider className="hidden md:block" />
+          <StatItem label="Bars" value={stats.bars} icon={Music2} color="#ff6b9d" className="hidden md:flex" />
+          <StatDivider className="hidden md:block" />
+          <StatItem label="Duration" value={stats.duration} icon={Timer} color="#fcee0a" className="hidden md:flex" />
         </div>
       </motion.div>
     </div>
@@ -343,18 +325,18 @@ function ToolbarButton({
         variant="ghost"
         size="icon"
         className={cn(
-          "h-8 w-8 rounded-lg border border-transparent transition-all duration-300",
+          "h-7 w-7 rounded-lg border border-transparent transition-all duration-300 md:h-8 md:w-8",
           variant === "destructive"
-            ? "text-white/50 hover:border-red-500/50 hover:bg-red-500/10 hover:text-red-400 hover:shadow-[0_0_15px_rgba(239,68,68,0.3)]"
+            ? "text-white/50 hover:border-red-500/50 hover:bg-red-500/10 hover:text-red-400"
             : active
-              ? "border-green-500/50 bg-green-500/10 text-green-400 shadow-[0_0_15px_rgba(34,197,94,0.3)]"
+              ? "border-green-500/50 bg-green-500/10 text-green-400"
               : "text-white/50 hover:border-white/20 hover:bg-white/5 hover:text-white",
         )}
         onClick={onClick}
         disabled={disabled}
         title={tooltip}
       >
-        <Icon className="h-4 w-4" />
+        <Icon className="h-3.5 w-3.5 md:h-4 md:w-4" />
       </Button>
     </motion.div>
   )
@@ -365,33 +347,32 @@ function StatItem({
   value,
   icon: Icon,
   color,
+  className,
 }: {
   label: string
   value: string | number
   icon: React.ComponentType<{ className?: string }>
   color: string
+  className?: string
 }) {
   return (
-    <motion.div className="flex items-center gap-2" whileHover={{ scale: 1.05, y: -2 }} transition={smoothSpring}>
-      <Icon
-        className="h-4 w-4 transition-all duration-300"
-        style={{ color, filter: `drop-shadow(0 0 8px ${color})` }}
-      />
-      <span className="text-sm text-white/50">{label}:</span>
+    <div className={cn("flex items-center gap-1.5 md:gap-2", className)}>
+      <Icon className="h-3.5 w-3.5 md:h-4 md:w-4" style={{ color, filter: `drop-shadow(0 0 8px ${color})` }} />
+      <span className="text-xs text-white/50 md:text-sm">{label}:</span>
       <motion.span
         key={String(value)}
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="text-sm font-semibold"
+        className="text-xs font-semibold md:text-sm"
         style={{ color, textShadow: `0 0 12px ${color}` }}
       >
         {value}
       </motion.span>
-    </motion.div>
+    </div>
   )
 }
 
-function StatDivider() {
-  return <div className="hidden h-5 w-px bg-white/10 md:block" />
+function StatDivider({ className }: { className?: string }) {
+  return <div className={cn("h-4 w-px bg-white/10 md:h-5", className)} />
 }

@@ -65,11 +65,10 @@ function BentoPanel({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30, scale: 0.96 }}
+      initial={{ opacity: 0, y: 20, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ ...gentleSpring, delay }}
       className={cn("group/panel relative overflow-hidden rounded-2xl", className)}
-      whileHover={{ scale: 1.01, y: -2 }}
     >
       <div
         className="absolute inset-0 transition-all duration-500"
@@ -82,9 +81,8 @@ function BentoPanel({
         }}
       />
 
-      {/* Border with glow */}
       <div
-        className="absolute inset-0 rounded-2xl transition-all duration-500 group-hover/panel:opacity-100 opacity-60"
+        className="absolute inset-0 rounded-2xl transition-all duration-500"
         style={{
           boxShadow: `
             inset 0 0 0 1px rgba(255,255,255,0.08),
@@ -94,15 +92,6 @@ function BentoPanel({
         }}
       />
 
-      {/* Hover glow enhancement */}
-      <motion.div
-        className="absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-500 group-hover/panel:opacity-100"
-        style={{
-          boxShadow: `0 0 60px ${colors.hover}`,
-        }}
-      />
-
-      {/* Top highlight line */}
       <div
         className="absolute inset-x-0 top-0 h-px opacity-50"
         style={{
@@ -118,14 +107,14 @@ function BentoPanel({
 export function LeftColumn() {
   return (
     <>
-      <BentoPanel delay={0.1} glowColor="cyan" className="flex flex-col">
+      <BentoPanel delay={0.05} glowColor="cyan" className="flex flex-col">
         <FileManagerPanel />
       </BentoPanel>
-      <BentoPanel delay={0.15} glowColor="magenta" className="flex flex-col">
-        <VersionHistoryPanel />
+      <BentoPanel delay={0.1} glowColor="magenta" className="flex flex-col">
+        <VersionHistoryPanelContent />
       </BentoPanel>
-      <BentoPanel delay={0.2} glowColor="purple" className="flex-1">
-        <QuickActionsPanel />
+      <BentoPanel delay={0.15} glowColor="purple" className="flex-1">
+        <QuickActionsPanelContent />
       </BentoPanel>
     </>
   )
@@ -152,19 +141,14 @@ function FileManagerPanel() {
     <>
       <div className="flex items-center justify-between border-b border-white/5 px-4 py-3">
         <div className="flex items-center gap-2">
-          <motion.div
-            animate={{ rotate: [0, 5, -5, 0] }}
-            transition={{ duration: 4, repeat: Number.POSITIVE_INFINITY, repeatDelay: 5 }}
-          >
-            <Folder className="h-4 w-4 text-[#00f0ff]" style={{ filter: "drop-shadow(0 0 8px #00f0ff)" }} />
-          </motion.div>
+          <Folder className="h-4 w-4 text-[#00f0ff]" style={{ filter: "drop-shadow(0 0 8px #00f0ff)" }} />
           <span className="font-semibold text-white">Files</span>
         </div>
         <motion.div whileHover={{ scale: 1.1, rotate: 90 }} whileTap={{ scale: 0.9 }} transition={smoothSpring}>
           <Button
             variant="ghost"
             size="icon"
-            className="h-7 w-7 rounded-lg border border-white/10 bg-white/5 text-white/50 transition-all duration-300 hover:border-[#00f0ff]/50 hover:bg-[#00f0ff]/10 hover:text-[#00f0ff] hover:shadow-[0_0_20px_rgba(0,240,255,0.3)]"
+            className="h-7 w-7 rounded-lg border border-white/10 bg-white/5 text-white/50 transition-all duration-300 hover:border-[#00f0ff]/50 hover:bg-[#00f0ff]/10 hover:text-[#00f0ff]"
             onClick={() => createFile()}
           >
             <Plus className="h-4 w-4" />
@@ -172,7 +156,7 @@ function FileManagerPanel() {
         </motion.div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-2 scrollbar-thin">
+      <div className="max-h-[200px] flex-1 overflow-y-auto p-2 scrollbar-thin md:max-h-none">
         {/* My Lyrics Section */}
         <div className="mb-2">
           <motion.button
@@ -311,17 +295,15 @@ function FileItem({
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: -15 }}
+      initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: index * 0.04, ...smoothSpring }}
-      whileHover={{ x: 6, backgroundColor: "rgba(255,255,255,0.05)" }}
+      transition={{ delay: index * 0.03, ...smoothSpring }}
       className={cn(
         "group relative flex cursor-pointer items-center gap-2 rounded-xl px-2 py-2 pl-8 text-sm transition-all duration-300",
-        isActive ? "bg-[#00f0ff]/10 text-white" : "text-white/60 hover:text-white",
+        isActive ? "bg-[#00f0ff]/10 text-white" : "text-white/60 hover:bg-white/5 hover:text-white",
       )}
       onClick={onClick}
     >
-      {/* Active indicator */}
       {isActive && (
         <motion.div
           layoutId="activeFile"
@@ -334,9 +316,8 @@ function FileItem({
       <File className="h-4 w-4 shrink-0" />
       <span className="flex-1 truncate">{file.title}</span>
 
-      {/* Uploaded time */}
       {file.updatedAt && (
-        <span className="text-xs text-white/30 opacity-0 transition-opacity group-hover:opacity-100">
+        <span className="hidden text-xs text-white/30 group-hover:inline md:inline">
           {formatDistanceToNow(new Date(file.updatedAt), { addSuffix: true })}
         </span>
       )}
@@ -375,7 +356,7 @@ function FileItem({
   )
 }
 
-function VersionHistoryPanel() {
+function VersionHistoryPanelContent() {
   const { versions, currentFileId, restoreVersion, clearVersions } = useStore()
   const fileVersions = versions
     .filter((v) => v.lyricId === currentFileId)
@@ -385,43 +366,32 @@ function VersionHistoryPanel() {
     <>
       <div className="flex items-center justify-between border-b border-white/5 px-4 py-3">
         <div className="flex items-center gap-2">
-          <motion.div animate={{ scale: [1, 1.1, 1] }} transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}>
-            <Clock className="h-4 w-4 text-[#ff00ff]" style={{ filter: "drop-shadow(0 0 8px #ff00ff)" }} />
-          </motion.div>
+          <Clock className="h-4 w-4 text-[#ff00ff]" style={{ filter: "drop-shadow(0 0 8px #ff00ff)" }} />
           <span className="font-semibold text-white">Version History</span>
         </div>
         {fileVersions.length > 0 && (
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 text-xs text-white/50 transition-colors duration-300 hover:text-red-400"
-              onClick={clearVersions}
-            >
-              Clear
-            </Button>
-          </motion.div>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 text-xs text-white/50 transition-colors duration-300 hover:text-red-400"
+            onClick={clearVersions}
+          >
+            Clear
+          </Button>
         )}
       </div>
 
-      <div className="flex-1 overflow-y-auto p-3 scrollbar-thin">
+      <div className="max-h-[150px] flex-1 overflow-y-auto p-3 scrollbar-thin md:max-h-none">
         {fileVersions.length === 0 ? (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="py-6 text-center text-sm text-white/40"
-          >
-            No versions saved yet
-          </motion.p>
+          <p className="py-4 text-center text-sm text-white/40">No versions saved yet</p>
         ) : (
           <div className="space-y-2">
             {fileVersions.slice(0, 5).map((version, i) => (
               <motion.div
                 key={version.id}
-                initial={{ opacity: 0, x: -15 }}
+                initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.06, ...smoothSpring }}
-                whileHover={{ scale: 1.02, x: 4 }}
+                transition={{ delay: i * 0.05, ...smoothSpring }}
                 className={cn(
                   "group cursor-pointer rounded-xl border p-3 transition-all duration-300",
                   i === 0
@@ -457,7 +427,7 @@ function VersionHistoryPanel() {
   )
 }
 
-function QuickActionsPanel() {
+function QuickActionsPanelContent() {
   const { createFile, currentFileId, duplicateFile, deleteFile, files } = useStore()
   const currentFile = files.find((f) => f.id === currentFileId)
 
@@ -475,12 +445,7 @@ function QuickActionsPanel() {
   return (
     <>
       <div className="flex items-center gap-2 border-b border-white/5 px-4 py-3">
-        <motion.div
-          animate={{ rotate: [0, 10, -10, 0] }}
-          transition={{ duration: 3, repeat: Number.POSITIVE_INFINITY, repeatDelay: 4 }}
-        >
-          <Sparkles className="h-4 w-4 text-[#9d4edd]" style={{ filter: "drop-shadow(0 0 8px #9d4edd)" }} />
-        </motion.div>
+        <Sparkles className="h-4 w-4 text-[#9d4edd]" style={{ filter: "drop-shadow(0 0 8px #9d4edd)" }} />
         <span className="font-semibold text-white">Quick Actions</span>
       </div>
 
@@ -535,68 +500,50 @@ function ActionButton({
   const colorMap = {
     cyan: {
       border: "border-[#00f0ff]/20",
-      hover: "hover:border-[#00f0ff]/50 hover:bg-[#00f0ff]/10 hover:shadow-[0_0_20px_rgba(0,240,255,0.2)]",
+      hover: "hover:border-[#00f0ff]/50 hover:bg-[#00f0ff]/10",
       text: "text-[#00f0ff]/80",
       hoverText: "hover:text-[#00f0ff]",
-      icon: "#00f0ff",
     },
     magenta: {
       border: "border-[#ff00ff]/20",
-      hover: "hover:border-[#ff00ff]/50 hover:bg-[#ff00ff]/10 hover:shadow-[0_0_20px_rgba(255,0,255,0.2)]",
+      hover: "hover:border-[#ff00ff]/50 hover:bg-[#ff00ff]/10",
       text: "text-[#ff00ff]/80",
       hoverText: "hover:text-[#ff00ff]",
-      icon: "#ff00ff",
     },
     purple: {
       border: "border-[#9d4edd]/20",
-      hover: "hover:border-[#9d4edd]/50 hover:bg-[#9d4edd]/10 hover:shadow-[0_0_20px_rgba(157,78,221,0.2)]",
+      hover: "hover:border-[#9d4edd]/50 hover:bg-[#9d4edd]/10",
       text: "text-[#9d4edd]/80",
       hoverText: "hover:text-[#9d4edd]",
-      icon: "#9d4edd",
     },
     white: {
       border: "border-white/10",
-      hover: "hover:border-white/25 hover:bg-white/5",
+      hover: "hover:border-white/20 hover:bg-white/5",
       text: "text-white/60",
       hoverText: "hover:text-white",
-      icon: "#ffffff",
     },
   }
 
-  const colors =
-    variant === "destructive"
-      ? {
-          border: "border-red-500/20",
-          hover: "hover:border-red-500/50 hover:bg-red-500/10 hover:shadow-[0_0_20px_rgba(239,68,68,0.2)]",
-          text: "text-red-400/70",
-          hoverText: "hover:text-red-400",
-          icon: "#ef4444",
-        }
-      : colorMap[color]
+  const colors = variant === "destructive" ? colorMap.white : colorMap[color]
 
   return (
     <motion.button
-      initial={{ opacity: 0, x: -20 }}
+      initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.05, ...smoothSpring }}
-      whileHover={{ x: 6, scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        "group flex items-center gap-3 rounded-xl border px-4 py-3 text-sm transition-all duration-300",
+        "flex items-center gap-3 rounded-xl border px-4 py-3 text-left text-sm transition-all duration-300",
         colors.border,
         colors.hover,
-        colors.text,
         colors.hoverText,
-        disabled && "cursor-not-allowed opacity-40",
+        disabled ? "cursor-not-allowed opacity-40" : "cursor-pointer",
+        variant === "destructive" && "hover:border-red-500/50 hover:bg-red-500/10 hover:text-red-400",
       )}
     >
-      <Icon
-        className="h-4 w-4 transition-all duration-300 group-hover:scale-110"
-        style={{ filter: disabled ? "none" : `drop-shadow(0 0 4px ${colors.icon})` }}
-      />
-      {label}
+      <Icon className={cn("h-4 w-4", variant === "destructive" ? "text-red-400/60" : colors.text)} />
+      <span className={variant === "destructive" ? "text-white/60" : colors.text}>{label}</span>
     </motion.button>
   )
 }

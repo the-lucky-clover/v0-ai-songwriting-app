@@ -5,6 +5,7 @@ import { Navbar } from "./dashboard/navbar"
 import { LeftColumn } from "./dashboard/left-column"
 import { CenterColumn } from "./dashboard/center-column"
 import { RightColumn } from "./dashboard/right-column"
+import { MobileNav } from "./dashboard/mobile-nav"
 import { AIModal } from "./dashboard/ai-modal"
 import { ThemeSelector } from "./dashboard/theme-selector"
 import { useStore } from "@/lib/store"
@@ -17,7 +18,8 @@ export function Dashboard() {
   const { isSidebarCollapsed } = useStore()
   const [themeOpen, setThemeOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
+  const [mousePos, setMousePos] = useState({ x: 50, y: 50 })
+  const [mobileView, setMobileView] = useState<"editor" | "files" | "tools">("editor")
   const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -40,8 +42,8 @@ export function Dashboard() {
 
   return (
     <div ref={containerRef} className="relative min-h-screen overflow-hidden bg-black">
+      {/* Background layers */}
       <div className="fixed inset-0">
-        {/* Base gradient */}
         <div
           className="absolute inset-0 transition-all duration-1000"
           style={{
@@ -80,7 +82,6 @@ export function Dashboard() {
           transition={{ duration: 25, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
         />
 
-        {/* Grid overlay */}
         <div
           className="absolute inset-0 opacity-[0.02]"
           style={{
@@ -92,7 +93,6 @@ export function Dashboard() {
           }}
         />
 
-        {/* Noise texture */}
         <div
           className="absolute inset-0 opacity-[0.012]"
           style={{
@@ -117,15 +117,28 @@ export function Dashboard() {
             transition={{ duration: 0.8 }}
             className="relative flex h-screen flex-col"
           >
+            {/* Desktop Navbar */}
             <motion.div
               initial={{ y: -100, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ ...fluidSpring, delay: 0.1 }}
+              className="hidden md:block"
             >
               <Navbar onThemeClick={() => setThemeOpen(true)} />
             </motion.div>
 
-            <div className="flex flex-1 gap-4 overflow-hidden p-4">
+            {/* Mobile Header */}
+            <motion.div
+              initial={{ y: -50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ ...fluidSpring, delay: 0.1 }}
+              className="md:hidden"
+            >
+              <MobileNav onThemeClick={() => setThemeOpen(true)} />
+            </motion.div>
+
+            {/* Desktop Layout */}
+            <div className="hidden flex-1 gap-4 overflow-hidden p-4 md:flex">
               {/* Left Column */}
               <motion.div
                 initial={{ x: -80, opacity: 0, scale: 0.95 }}
@@ -156,6 +169,62 @@ export function Dashboard() {
                 <RightColumn />
               </motion.div>
             </div>
+
+            {/* Mobile Layout - Tab-based navigation */}
+            <div className="flex flex-1 flex-col overflow-hidden md:hidden">
+              {/* Mobile Tab Bar */}
+              <div className="flex border-b border-white/10 bg-black/40 backdrop-blur-xl">
+                <MobileTabButton active={mobileView === "files"} onClick={() => setMobileView("files")} label="Files" />
+                <MobileTabButton
+                  active={mobileView === "editor"}
+                  onClick={() => setMobileView("editor")}
+                  label="Editor"
+                />
+                <MobileTabButton active={mobileView === "tools"} onClick={() => setMobileView("tools")} label="Tools" />
+              </div>
+
+              {/* Mobile Content Area */}
+              <div className="flex-1 overflow-hidden p-3">
+                <AnimatePresence mode="wait">
+                  {mobileView === "files" && (
+                    <motion.div
+                      key="files"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ duration: 0.25, ease: "easeOut" }}
+                      className="flex h-full flex-col gap-3 overflow-auto"
+                    >
+                      <LeftColumn />
+                    </motion.div>
+                  )}
+                  {mobileView === "editor" && (
+                    <motion.div
+                      key="editor"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 20 }}
+                      transition={{ duration: 0.25, ease: "easeOut" }}
+                      className="flex h-full flex-col"
+                    >
+                      <CenterColumn />
+                    </motion.div>
+                  )}
+                  {mobileView === "tools" && (
+                    <motion.div
+                      key="tools"
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 20 }}
+                      transition={{ duration: 0.25, ease: "easeOut" }}
+                      className="flex h-full flex-col gap-3 overflow-auto"
+                    >
+                      <RightColumn />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -163,5 +232,35 @@ export function Dashboard() {
       <AIModal />
       <ThemeSelector open={themeOpen} onOpenChange={setThemeOpen} />
     </div>
+  )
+}
+
+function MobileTabButton({
+  active,
+  onClick,
+  label,
+}: {
+  active: boolean
+  onClick: () => void
+  label: string
+}) {
+  return (
+    <motion.button
+      onClick={onClick}
+      className={`relative flex-1 py-3 text-sm font-medium transition-all duration-300 ${
+        active ? "text-[#00f0ff]" : "text-white/50"
+      }`}
+      whileTap={{ scale: 0.98 }}
+    >
+      {label}
+      {active && (
+        <motion.div
+          layoutId="mobileTabIndicator"
+          className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#00f0ff]"
+          style={{ boxShadow: "0 0 10px #00f0ff" }}
+          transition={{ type: "spring", stiffness: 400, damping: 30 }}
+        />
+      )}
+    </motion.button>
   )
 }

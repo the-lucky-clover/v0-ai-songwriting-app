@@ -26,7 +26,7 @@ export function IntroAnimation({ onComplete }: IntroAnimationProps) {
         <motion.div
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.8, ease: "easeInOut" }}
           className="fixed inset-0 z-50 flex items-center justify-center bg-black"
         >
           {/* Scanning lines */}
@@ -42,7 +42,7 @@ export function IntroAnimation({ onComplete }: IntroAnimationProps) {
                   repeat: Number.POSITIVE_INFINITY,
                   ease: "linear",
                 }}
-                className="absolute h-px w-full bg-gradient-to-r from-transparent via-[#00f0ff] to-transparent"
+                className="absolute h-px w-full bg-gradient-to-r from-transparent via-cyan-500 to-transparent"
                 style={{ top: `${i * 5}%` }}
               />
             ))}
@@ -71,11 +71,20 @@ export function IntroAnimation({ onComplete }: IntroAnimationProps) {
                       ],
                     }}
                     transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY }}
-                    className="text-5xl font-black tracking-[0.2em] text-white md:text-7xl"
+                    className="text-5xl font-black tracking-[0.15em] text-white md:text-7xl"
                     style={{ fontFamily: "Orbitron, system-ui" }}
                   >
                     LYRICAL
                   </motion.h1>
+                  <motion.span
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                    className="mt-2 block bg-gradient-to-r from-cyan-400 to-pink-500 bg-clip-text text-3xl font-black tracking-[0.2em] text-transparent md:text-5xl"
+                    style={{ fontFamily: "Orbitron, system-ui" }}
+                  >
+                    AI
+                  </motion.span>
                 </motion.div>
               )}
 
@@ -106,15 +115,13 @@ export function IntroAnimation({ onComplete }: IntroAnimationProps) {
                   rotate: { duration: 3 + i * 0.5, repeat: Number.POSITIVE_INFINITY, ease: "linear" },
                 }}
                 className="absolute left-1/2 top-1/2"
-                style={{
-                  transformOrigin: "0 0",
-                }}
+                style={{ transformOrigin: "0 0" }}
               >
                 <div
                   className="h-2 w-2 rounded-full"
                   style={{
-                    background: `hsl(${i * 45}, 100%, 60%)`,
-                    boxShadow: `0 0 20px hsl(${i * 45}, 100%, 60%)`,
+                    background: `hsl(${i * 45 + 180}, 100%, 60%)`,
+                    boxShadow: `0 0 20px hsl(${i * 45 + 180}, 100%, 60%)`,
                     transform: `translate(${80 + i * 10}px, 0)`,
                   }}
                 />

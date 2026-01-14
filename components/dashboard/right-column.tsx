@@ -35,13 +35,11 @@ function BentoPanel({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30, scale: 0.96 }}
+      initial={{ opacity: 0, y: 20, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ ...gentleSpring, delay }}
       className={cn("group/panel relative overflow-hidden rounded-2xl", className)}
-      whileHover={{ scale: 1.01, y: -2 }}
     >
-      {/* Multi-layer glassmorphic background */}
       <div
         className="absolute inset-0 transition-all duration-500"
         style={{
@@ -53,9 +51,8 @@ function BentoPanel({
         }}
       />
 
-      {/* Border with glow */}
       <div
-        className="absolute inset-0 rounded-2xl transition-all duration-500 group-hover/panel:opacity-100 opacity-60"
+        className="absolute inset-0 rounded-2xl transition-all duration-500"
         style={{
           boxShadow: `
             inset 0 0 0 1px rgba(255,255,255,0.08),
@@ -65,15 +62,6 @@ function BentoPanel({
         }}
       />
 
-      {/* Hover glow enhancement */}
-      <motion.div
-        className="absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-500 group-hover/panel:opacity-100"
-        style={{
-          boxShadow: `0 0 60px ${colors.hover}`,
-        }}
-      />
-
-      {/* Top highlight line */}
       <div
         className="absolute inset-x-0 top-0 h-px opacity-50"
         style={{
@@ -90,13 +78,13 @@ export function RightColumn() {
   return (
     <>
       <AISongwriterButton />
-      <BentoPanel delay={0.1} glowColor="magenta" className="flex flex-col">
+      <BentoPanel delay={0.05} glowColor="magenta" className="flex flex-col">
         <RhymeDictionaryPanel />
       </BentoPanel>
-      <BentoPanel delay={0.15} glowColor="yellow" className="flex flex-col">
+      <BentoPanel delay={0.1} glowColor="yellow" className="flex flex-col">
         <PhraseSuggestionsPanel />
       </BentoPanel>
-      <BentoPanel delay={0.2} glowColor="purple" className="flex-1">
+      <BentoPanel delay={0.15} glowColor="purple" className="flex-1">
         <SynonymsPanel />
       </BentoPanel>
     </>
@@ -108,26 +96,22 @@ function AISongwriterButton() {
 
   return (
     <motion.button
-      initial={{ opacity: 0, y: 30, scale: 0.96 }}
+      initial={{ opacity: 0, y: 20, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={gentleSpring}
-      whileHover={{ scale: 1.02, y: -3 }}
       whileTap={{ scale: 0.98 }}
       onClick={() => setIsAIModalOpen(true)}
-      className="group relative overflow-hidden rounded-2xl p-6 text-left"
+      className="group relative overflow-hidden rounded-2xl p-5 text-left md:p-6"
     >
-      {/* Background layers */}
       <div
         className="absolute inset-0 transition-all duration-500"
         style={{
-          background: `
-            linear-gradient(135deg, rgba(0,240,255,0.12) 0%, rgba(157,78,221,0.12) 50%, rgba(255,0,255,0.12) 100%)
-          `,
+          background:
+            "linear-gradient(135deg, rgba(0,240,255,0.12) 0%, rgba(157,78,221,0.12) 50%, rgba(255,0,255,0.12) 100%)",
           backdropFilter: "blur(40px)",
         }}
       />
 
-      {/* Animated shimmer */}
       <motion.div
         className="absolute inset-0"
         style={{
@@ -138,7 +122,6 @@ function AISongwriterButton() {
         transition={{ duration: 4, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
       />
 
-      {/* Rotating gradient border */}
       <motion.div
         className="absolute -inset-0.5 rounded-2xl opacity-70"
         animate={{
@@ -153,25 +136,18 @@ function AISongwriterButton() {
       />
       <div className="absolute inset-0.5 rounded-[14px] bg-black/85" />
 
-      {/* Content */}
       <div className="relative">
-        <div className="mb-4 flex items-center gap-2">
-          <motion.div
-            animate={{ rotate: [0, 360] }}
-            transition={{ duration: 10, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-          >
-            <Wand2 className="h-6 w-6 text-[#00f0ff]" style={{ filter: "drop-shadow(0 0 12px #00f0ff)" }} />
-          </motion.div>
-          <motion.div animate={{ scale: [1, 1.3, 1] }} transition={{ duration: 2.5, repeat: Number.POSITIVE_INFINITY }}>
-            <Sparkles className="h-5 w-5 text-[#ff00ff]" style={{ filter: "drop-shadow(0 0 12px #ff00ff)" }} />
-          </motion.div>
-          <motion.div animate={{ y: [0, -4, 0] }} transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}>
-            <Zap className="h-6 w-6 text-[#9d4edd]" style={{ filter: "drop-shadow(0 0 12px #9d4edd)" }} />
-          </motion.div>
+        <div className="mb-3 flex items-center gap-2 md:mb-4">
+          <Wand2 className="h-5 w-5 text-[#00f0ff] md:h-6 md:w-6" style={{ filter: "drop-shadow(0 0 12px #00f0ff)" }} />
+          <Sparkles
+            className="h-4 w-4 text-[#ff00ff] md:h-5 md:w-5"
+            style={{ filter: "drop-shadow(0 0 12px #ff00ff)" }}
+          />
+          <Zap className="h-5 w-5 text-[#9d4edd] md:h-6 md:w-6" style={{ filter: "drop-shadow(0 0 12px #9d4edd)" }} />
         </div>
-        <h3 className="mb-2 text-lg font-bold tracking-wide text-white">AI SONGWRITER</h3>
-        <p className="mb-4 text-sm text-white/60">Neural lyric generation with style emulation</p>
-        <div className="flex items-center gap-2 text-sm font-medium text-[#00f0ff]">
+        <h3 className="mb-1.5 text-base font-bold tracking-wide text-white md:mb-2 md:text-lg">AI SONGWRITER</h3>
+        <p className="mb-3 text-xs text-white/60 md:mb-4 md:text-sm">Neural lyric generation with style emulation</p>
+        <div className="flex items-center gap-2 text-xs font-medium text-[#00f0ff] md:text-sm">
           Launch Studio
           <motion.span animate={{ x: [0, 8, 0] }} transition={{ duration: 1.2, repeat: Number.POSITIVE_INFINITY }}>
             →
@@ -210,16 +186,11 @@ function RhymeDictionaryPanel() {
   return (
     <>
       <div className="flex items-center gap-2 border-b border-white/5 px-4 py-3">
-        <motion.div
-          animate={{ rotateY: [0, 360] }}
-          transition={{ duration: 4, repeat: Number.POSITIVE_INFINITY, repeatDelay: 3 }}
-        >
-          <BookOpen className="h-4 w-4 text-[#ff00ff]" style={{ filter: "drop-shadow(0 0 8px #ff00ff)" }} />
-        </motion.div>
+        <BookOpen className="h-4 w-4 text-[#ff00ff]" style={{ filter: "drop-shadow(0 0 8px #ff00ff)" }} />
         <span className="font-semibold text-white">Rhyme Dictionary</span>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 scrollbar-thin">
+      <div className="max-h-[180px] flex-1 overflow-y-auto p-4 scrollbar-thin md:max-h-none">
         {debouncedWord ? (
           <>
             <p className="mb-3 text-sm text-white/50">
@@ -227,13 +198,8 @@ function RhymeDictionaryPanel() {
             </p>
 
             {loading ? (
-              <div className="flex items-center justify-center py-8">
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-                >
-                  <Loader2 className="h-6 w-6 text-[#00f0ff]" />
-                </motion.div>
+              <div className="flex items-center justify-center py-6">
+                <Loader2 className="h-5 w-5 animate-spin text-[#00f0ff]" />
               </div>
             ) : (
               <>
@@ -243,7 +209,7 @@ function RhymeDictionaryPanel() {
                       Perfect Rhymes
                     </h4>
                     <div className="space-y-1.5">
-                      {rhymes.perfect.slice(0, 8).map((r, i) => (
+                      {rhymes.perfect.slice(0, 6).map((r, i) => (
                         <RhymeItem key={r.word} rhyme={r} onInsert={insertWord} index={i} />
                       ))}
                     </div>
@@ -254,7 +220,7 @@ function RhymeDictionaryPanel() {
                   <div>
                     <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-[#ff00ff]">Near Rhymes</h4>
                     <div className="space-y-1.5">
-                      {rhymes.near.slice(0, 6).map((r, i) => (
+                      {rhymes.near.slice(0, 4).map((r, i) => (
                         <RhymeItem key={r.word} rhyme={r} onInsert={insertWord} index={i} />
                       ))}
                     </div>
@@ -262,13 +228,13 @@ function RhymeDictionaryPanel() {
                 )}
 
                 {rhymes.perfect.length === 0 && rhymes.near.length === 0 && (
-                  <p className="py-6 text-center text-sm text-white/40">No rhymes found</p>
+                  <p className="py-4 text-center text-sm text-white/40">No rhymes found</p>
                 )}
               </>
             )}
           </>
         ) : (
-          <p className="py-8 text-center text-sm text-white/40">Start typing to see rhymes</p>
+          <p className="py-6 text-center text-sm text-white/40">Start typing to see rhymes</p>
         )}
       </div>
     </>
@@ -282,26 +248,23 @@ function RhymeItem({
 }: { rhyme: RhymeResult; onInsert: (word: string) => void; index: number }) {
   return (
     <motion.div
-      initial={{ opacity: 0, x: -15 }}
+      initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: index * 0.04, ...smoothSpring }}
-      whileHover={{ x: 6, backgroundColor: "rgba(255,255,255,0.05)" }}
-      className="group flex items-center justify-between rounded-xl border border-white/5 px-3 py-2.5 transition-all duration-300 hover:border-white/15"
+      transition={{ delay: index * 0.03, ...smoothSpring }}
+      className="group flex items-center justify-between rounded-xl border border-white/5 px-3 py-2 transition-all duration-300 hover:border-white/15 hover:bg-white/5"
     >
-      <div className="flex items-center gap-3">
-        <span className="text-white">{rhyme.word}</span>
+      <div className="flex items-center gap-2">
+        <span className="text-sm text-white">{rhyme.word}</span>
         <span className="text-xs text-white/35">({rhyme.syllables} syl)</span>
       </div>
-      <motion.div whileHover={{ scale: 1.2 }} whileTap={{ scale: 0.9 }}>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-6 w-6 opacity-0 transition-all duration-200 group-hover:opacity-100"
-          onClick={() => onInsert(rhyme.word)}
-        >
-          <Plus className="h-4 w-4 text-[#00f0ff]" />
-        </Button>
-      </motion.div>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-6 w-6 opacity-0 transition-all duration-200 group-hover:opacity-100"
+        onClick={() => onInsert(rhyme.word)}
+      >
+        <Plus className="h-4 w-4 text-[#00f0ff]" />
+      </Button>
     </motion.div>
   )
 }
@@ -331,20 +294,14 @@ function PhraseSuggestionsPanel() {
   return (
     <>
       <div className="flex items-center gap-2 border-b border-white/5 px-4 py-3">
-        <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}>
-          <Lightbulb className="h-4 w-4 text-[#fcee0a]" style={{ filter: "drop-shadow(0 0 8px #fcee0a)" }} />
-        </motion.div>
+        <Lightbulb className="h-4 w-4 text-[#fcee0a]" style={{ filter: "drop-shadow(0 0 8px #fcee0a)" }} />
         <span className="font-semibold text-white">Suggestions</span>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 scrollbar-thin">
+      <div className="max-h-[150px] flex-1 overflow-y-auto p-4 scrollbar-thin md:max-h-none">
         {loading && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="mb-4 overflow-hidden rounded-xl border border-white/5 bg-white/5 px-3 py-3"
-          >
-            <div className="mb-2 flex items-center gap-2">
+          <div className="mb-3 overflow-hidden rounded-xl border border-white/5 bg-white/5 px-3 py-2.5">
+            <div className="mb-1.5 flex items-center gap-2">
               <div className="h-2 flex-1 overflow-hidden rounded-full bg-white/10">
                 <motion.div
                   className="h-full rounded-full"
@@ -356,41 +313,38 @@ function PhraseSuggestionsPanel() {
               <span className="text-xs text-white/50">67%</span>
             </div>
             <p className="text-xs text-white/40">Analyzing style...</p>
-          </motion.div>
+          </div>
         )}
 
         <AnimatePresence>
           {suggestions.map((s, i) => (
             <motion.div
               key={s.phrase}
-              initial={{ opacity: 0, y: 15 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ delay: i * 0.1, ...smoothSpring }}
-              whileHover={{ scale: 1.02, x: 4 }}
-              className="group mb-2 cursor-pointer rounded-xl border border-white/5 p-3 transition-all duration-300 hover:border-[#fcee0a]/30 hover:bg-[#fcee0a]/5"
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ delay: i * 0.08, ...smoothSpring }}
+              className="group mb-2 cursor-pointer rounded-xl border border-white/5 p-2.5 transition-all duration-300 hover:border-[#fcee0a]/30 hover:bg-[#fcee0a]/5"
             >
-              <p className="mb-1.5 text-sm text-white">&quot;{s.phrase}&quot;</p>
+              <p className="mb-1 text-sm text-white">&quot;{s.phrase}&quot;</p>
               <div className="flex items-center justify-between text-xs">
                 <span className="text-white/40">
                   {s.syllables} syllables • {s.mood}
                 </span>
-                <motion.div whileHover={{ scale: 1.2 }}>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-5 w-5 opacity-0 transition-all duration-200 group-hover:opacity-100"
-                  >
-                    <Plus className="h-3 w-3 text-[#fcee0a]" />
-                  </Button>
-                </motion.div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-5 w-5 opacity-0 transition-all duration-200 group-hover:opacity-100"
+                >
+                  <Plus className="h-3 w-3 text-[#fcee0a]" />
+                </Button>
               </div>
             </motion.div>
           ))}
         </AnimatePresence>
 
         {!loading && suggestions.length === 0 && (
-          <p className="py-6 text-center text-sm text-white/40">Type to get AI suggestions</p>
+          <p className="py-4 text-center text-sm text-white/40">Type to get AI suggestions</p>
         )}
       </div>
     </>
@@ -425,34 +379,26 @@ function SynonymsPanel() {
   return (
     <>
       <div className="flex items-center gap-2 border-b border-white/5 px-4 py-3">
-        <motion.div animate={{ rotateZ: [0, 5, -5, 0] }} transition={{ duration: 3, repeat: Number.POSITIVE_INFINITY }}>
-          <Type className="h-4 w-4 text-[#9d4edd]" style={{ filter: "drop-shadow(0 0 8px #9d4edd)" }} />
-        </motion.div>
+        <Type className="h-4 w-4 text-[#9d4edd]" style={{ filter: "drop-shadow(0 0 8px #9d4edd)" }} />
         <span className="font-semibold text-white">Synonyms</span>
       </div>
 
       <div className="p-4">
         {loading ? (
-          <div className="flex items-center justify-center py-6">
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-            >
-              <Loader2 className="h-5 w-5 text-[#9d4edd]" />
-            </motion.div>
+          <div className="flex items-center justify-center py-4">
+            <Loader2 className="h-5 w-5 animate-spin text-[#9d4edd]" />
           </div>
         ) : synonyms.length > 0 ? (
           <div className="flex flex-wrap gap-2">
-            {synonyms.slice(0, 12).map((s, i) => (
+            {synonyms.slice(0, 10).map((s, i) => (
               <motion.button
                 key={s.word}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: i * 0.04, ...smoothSpring }}
-                whileHover={{ scale: 1.1, y: -3 }}
+                transition={{ delay: i * 0.03, ...smoothSpring }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => insertWord(s.word)}
-                className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white/70 transition-all duration-300 hover:border-[#9d4edd]/50 hover:bg-[#9d4edd]/10 hover:text-white hover:shadow-[0_0_15px_rgba(157,78,221,0.3)]"
+                className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white/70 transition-all duration-300 hover:border-[#9d4edd]/50 hover:bg-[#9d4edd]/10 hover:text-white"
               >
                 {s.word}
               </motion.button>
